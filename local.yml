@@ -1,0 +1,93 @@
+version: '3'
+
+volumes:
+  local_postgres_data: {}
+  local_postgres_data_backups: {}
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: backend_local_django
+    container_name: backend_django
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app:z
+    env_file:
+      - ./.env
+    ports:
+      - "8000:8000"
+    command: /start
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/local/postgres/Dockerfile
+    image: backend_local_postgres
+    container_name: backend_postgres
+    volumes:
+      - local_postgres_data:/var/lib/postgresql/data:Z
+      - local_postgres_data_backups:/backups:z
+    env_file:
+      - ./.env
+
+  docs:
+    image: backend_local_docs
+    container_name: backend_docs
+    build:
+      context: .
+      dockerfile: ./compose/local/docs/Dockerfile
+    env_file:
+      - ./.env
+    volumes:
+      - ./docs:/docs:z
+      - ./config:/app/config:z
+      - ./backend:/app/backend:z
+    ports:
+      - "7000:7000"
+
+  redis:
+    image: redis:5.0
+    container_name: backend_redis
+
+  celeryworker:
+    <<: *django
+    image: backend_local_celeryworker
+    container_name: backend_celeryworker
+    depends_on:
+      - redis
+      - postgres
+      
+    ports: []
+    command: /start-celeryworker
+
+  celerybeat:
+    <<: *django
+    image: backend_local_celerybeat
+    container_name: backend_celerybeat
+    depends_on:
+      - redis
+      - postgres
+      
+    ports: []
+    command: /start-celerybeat
+
+  node:
+    build:
+      context: .
+      dockerfile: ./compose/local/node/Dockerfile
+    image: muestra_local_node
+    container_name: backend_node
+    depends_on:
+      - django
+    volumes:
+      - .:/app:z
+      # http://jdlm.info/articles/2016/03/06/lessons-building-node-app-docker.html
+      - /app/node_modules
+    command: npm run dev
+    ports:
+      - "3000:3000"
+      # Expose browsersync UI: https://www.browsersync.io/docs/options/#option-ui
+      - "3001:3001"
