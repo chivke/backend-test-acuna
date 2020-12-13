@@ -1,7 +1,6 @@
-from django.contrib.auth.models import AbstractUser
-
 from django.db import models
 from django.urls import reverse
+from django.contrib.auth.models import AbstractUser, UserManager
 
 
 class Profile(models.Model):
@@ -31,7 +30,7 @@ class Profile(models.Model):
         return f'{self.user.username} <{self.role}>'
 
 
-class UserManager(models.Manager):
+class UserManager(UserManager):
     '''Model manager who creates profile when creating users.'''
 
     def create(self, role='E', *args, **kwargs):
