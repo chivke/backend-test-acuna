@@ -267,3 +267,6 @@ tags
 
 # IPython shell
 .ipython/
+
+# Pytest cache
+.pytest_cache/
