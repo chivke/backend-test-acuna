@@ -1,0 +1,29 @@
+
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Today's Menu! ({{ today_date }}){% endblock %}
+
+{% block content %}
+
+  <h1>Today's Menu! ({{ today_date }})</h1>
+  <h3>Hello! I share with you today's menu :)</h3>
+
+  <ul class="list-group">
+    {% for plate in menu.plates %}
+      <li class="list-group-item 
+       {% if meal.plate == plate %}active{% endif %}"
+      >plate.short_desc</li>
+    {% endfor %}
+  </ul>
+  {% if not meal %}
+    <p>Select the food you prefer!</p>
+    <a href="{% url 'meals:menu-preference' %}"
+       role="button" class="btn btn-primary">Go</a>
+  {% elif meal.participated %}
+    <p>You have already selected your food!</p>
+  {% else %}
+    <p>You did not participate, you are automatically assigned a meal</p>
+  {% endif %}
+{% endblock content %}

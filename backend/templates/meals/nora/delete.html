@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Delete {{ aux }}{% endblock %}
+
+{% block content %}
+  <h2>Update {{ aux }}</h2>
+
+  <form class="form-horizontal" method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <p>Are you sure you want to delete the "{{ object }}" {{ aux }}?</p>
+    <input type="submit" value="Confirm">
+
+    <div class="control-group">
+      <div class="controls">
+        <button type="submit" class="btn btn-primary">Confirm</button>
+      </div>
+    </div>
+  </form>
+
+{% endblock content %}

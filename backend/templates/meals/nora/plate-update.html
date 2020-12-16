@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+  <h2>Update plate</h2>
+
+  <form class="form-horizontal" method="post" action="{% url 'meals:plate-update' object.pk %}">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <div class="control-group">
+      <div class="controls">
+        <button type="submit" class="btn btn-primary">Update</button>
+      </div>
+    </div>
+  </form>
+
+{% endblock content %}
+
+ 
