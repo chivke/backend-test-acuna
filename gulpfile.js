@@ -90,19 +90,6 @@ function scripts() {
     .pipe(dest(paths.js))
 }
 
-
-// Vendor Javascript minification
-function vendorScripts() {
-  return src(paths.vendorsJs)
-    .pipe(concat('vendors.js'))
-    .pipe(dest(paths.js))
-    .pipe(plumber()) // Checks for errors
-    .pipe(uglify()) // Minifies the js
-    .pipe(rename({ suffix: '.min' }))
-    .pipe(dest(paths.js))
-}
-
-
 // Image compression
 function imgCompression() {
   return src(`${paths.images}/*`)
