@@ -214,3 +214,7 @@ CORS_URLS_REGEX = r"^/api/.*$"
 # Time limit to prefer plate from the menu
 
 MEALS_PREFERENCE_LIMIT = env('MEALS_PREFERENCE_LIMIT', default='11:00:00')
+
+# Slack's app token
+
+SLACK_BOT_TOKEN = env('SLACK_BOT_TOKEN')
