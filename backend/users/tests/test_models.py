@@ -5,10 +5,6 @@ from backend.users.models import User, Profile
 pytestmark = pytest.mark.django_db
 
 
-def test_user_attrs(user: User):
-    assert isinstance(user.username, str)
-
-
 def test_user_str(user: User):
     assert str(user) == str(user.profile)
     other = User(username='usertest')
@@ -39,7 +35,5 @@ def test_profile_str(user: User):
     assert str(user.profile) == f'{user.username} <{user.profile.role}>'
 
 
-def test_profile_attrs(user: User):
-    assert isinstance(user.profile.role, str) and \
-        len(user.profile.role) == 1
-    assert user == user.profile.user
+def test_profile_is_nora(user: User):
+    assert not user.profile.is_nora

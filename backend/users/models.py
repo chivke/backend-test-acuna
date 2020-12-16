@@ -29,6 +29,10 @@ class Profile(models.Model):
     def __str__(self):
         return f'{self.user.username} <{self.role}>'
 
+    @property
+    def is_nora(self):
+        return True if self.role == 'N' else False
+
 
 class UserManager(UserManager):
     '''Model manager who creates profile when creating users.'''
@@ -60,6 +64,11 @@ class User(AbstractUser):
         except User.profile.RelatedObjectDoesNotExist:
             string = self.username
         return f'{string}'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        role = 'N' if self.is_superuser else 'E'
+        self.create_profile(role=role)
 
     def get_absolute_url(self):
         '''Get url for user's detail view.
