@@ -4,13 +4,15 @@ from django.urls import reverse
 from django.views.generic import CreateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
+from django.contrib.messages.views import SuccessMessageMixin
 from backend.meals.forms import MenuPreferenceForm
 from backend.meals.models import MenuModel, MealModel
 
 
-class MenuPreferenceView(LoginRequiredMixin, CreateView):
+class MenuPreferenceView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     template_name = 'menu/preference.html'
     form_class = MenuPreferenceForm
+    success_message = 'a "%(plate)"" plate was preferred'
 
     def dispatch(self, request, pk, *args, **kwargs):
         self.menu = get_object_or_404(MenuModel, pk=pk)
@@ -26,6 +28,9 @@ class MenuPreferenceView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse('meals:menu-detail', args=[self.menu.pk])
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(plate=self.object.plate.short_desc)
 
 
 menu_preference_view = MenuPreferenceView.as_view()
