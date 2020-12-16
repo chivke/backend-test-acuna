@@ -21,6 +21,8 @@ class Profile(models.Model):
     user = models.OneToOneField(
         'User', on_delete=models.CASCADE,
         related_name='profile')
+    slack_id = models.CharField(
+        max_length=300, null=True, blank=True)
 
     class Meta:
         verbose_name = 'profile'
@@ -46,6 +48,9 @@ class UserManager(UserManager):
         user, created = super().get_or_create(*args, **kwargs)
         user.create_profile(role=role)
         return user, created
+
+    def with_slack(self):
+        return self.exclude(profile__slack_id=None)
 
 
 class User(AbstractUser):
