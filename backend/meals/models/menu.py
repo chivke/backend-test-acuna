@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.conf import settings
 
 from .abstract import AbstractMealsModel, MealsManager
+from backend.meals.tasks import announce_menu_in_slacks
 
 
 class MenuManager(MealsManager):
@@ -23,15 +24,16 @@ class MenuModel(AbstractMealsModel):
     PLANNING = 0
     WAITING = 1
     DISPATCHED = 2
-    # DELIVERED = 3
     STATUS_CHOICES = (
         (PLANNING, 'Planning the menu'),
         (WAITING, 'Waiting for preferences'),
         (DISPATCHED, 'Dispatched to employes'),
-        # (DELIVERED, 'Delivered'),
     )
 
     class NotCurrently(Exception):
+        pass
+
+    class NotAnnouncedYet(Exception):
         pass
 
     date = models.DateField(unique=True)
@@ -58,14 +60,31 @@ class MenuModel(AbstractMealsModel):
         return self.date == date.today()
 
     def announce(self):
+        '''
+        Change status to waiting (1) and announce it via slack.
+        '''
         if self.current:
-            return None  # implementar task
+            if self.status > self.WAITING:
+                raise self.NotCurrently
+            self.announce_menu_in_slacks(self.pk)
         raise self.NotCurrently
 
     def out_of_limit(self):
+        '''
+        '''
         limit = settings.MEALS_PREFERENCE_LIMIT
         now = dt.now()
         limit = dt.strptime(
             f'{dt.strftime(now, "%Y-%m-%d ")}' + limit,
             '%Y-%m-%d %H:%M:%S')
         return now > limit
+
+    def close_preference(self):
+        '''
+        '''
+        if not self.announced:
+            raise self.NotAnnouncedYet
+        if not self.current:
+            raise self.NotCurrently
+        self.status == self.DISPATCHED
+        self.save()
