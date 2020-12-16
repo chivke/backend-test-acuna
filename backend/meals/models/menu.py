@@ -27,7 +27,7 @@ class MenuModel(AbstractMealsModel):
     STATUS_CHOICES = (
         (PLANNING, 'Planning the menu'),
         (WAITING, 'Waiting for preferences'),
-        (DISPATCHED, 'Dispatched to employes'),
+        (DISPATCHED, 'Dispatched to employees'),
     )
 
     class NotCurrently(Exception):
@@ -66,7 +66,11 @@ class MenuModel(AbstractMealsModel):
         if self.current:
             if self.status > self.WAITING:
                 raise self.NotCurrently
-            self.announce_menu_in_slacks(self.pk)
+            employees = User.objects.with_slack()
+            for employee in employees:
+                self.announce_menu_in_slack(
+                    self.pk, employee.pk)
+            return None
         raise self.NotCurrently
 
     def out_of_limit(self):
