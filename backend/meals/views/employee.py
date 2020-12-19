@@ -11,6 +11,9 @@ from backend.meals.models import MenuModel, MealModel
 
 
 class MenuPreferenceView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    '''
+    View that allows an employee to select the food they prefer.
+    '''
     template_name = 'meals/menu/preference.html'
     form_class = MenuPreferenceForm
     success_message = 'a %(plate)s plate was preferred'
@@ -42,6 +45,9 @@ menu_preference_view = MenuPreferenceView.as_view()
 
 
 class MenuView(DetailView):
+    '''
+    Public view that allows to know the menu of the day.
+    '''
     template_name = 'meals/menu/detail.html'
     queryset = MenuModel.objects.today()
 
