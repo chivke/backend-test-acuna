@@ -144,7 +144,6 @@ function watchPaths() {
 const generateAssets = parallel(
   styles,
   scripts,
-  vendorScripts,
   imgCompression
 )
 
