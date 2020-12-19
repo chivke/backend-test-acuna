@@ -59,13 +59,13 @@ aws_s3_domain = AWS_S3_CUSTOM_DOMAIN or f'{AWS_STORAGE_BUCKET_NAME}'\
 
 # Static
 
-STATICFILES_STORAGE = 'beebot.utils.storages.StaticRootS3Boto3Storage'
+STATICFILES_STORAGE = 'backend.utils.storages.StaticRootS3Boto3Storage'
 COLLECTFAST_STRATEGY = 'collectfast.strategies.boto3.Boto3Strategy'
 STATIC_URL = f'https://{aws_s3_domain}/static/'
 
 # Media
 
-DEFAULT_FILE_STORAGE = 'beebot.utils.storages.MediaRootS3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'backend.utils.storages.MediaRootS3Boto3Storage'
 MEDIA_URL = f'https://{aws_s3_domain}/media/'
 
 # Templates

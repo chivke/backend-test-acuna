@@ -46,9 +46,6 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "django_celery_beat",
-    "rest_framework",
-    "rest_framework.authtoken",
-    "corsheaders",
 ]
 
 LOCAL_APPS = [
@@ -80,7 +77,6 @@ PASSWORD_HASHERS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # 'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -152,15 +148,6 @@ EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND',
                     default='django.core.mail.backends.smtp.EmailBackend')
 EMAIL_TIMEOUT = 5
 
-# ADMIN
-# ------------------------------------------------------------------------------
-# Django Admin URL.
-# ADMIN_URL = 'admin/'
-# https://docs.djangoproject.com/en/dev/ref/settings/#admins
-# ADMINS = [('''FYX''', 'contact@fyxltda.com')]
-# https://docs.djangoproject.com/en/dev/ref/settings/#managers
-# MANAGERS = ADMINS
-
 # Logging
 
 LOGGING = {
@@ -195,26 +182,11 @@ CELERY_TASK_TIME_LIMIT = 5 * 60
 CELERY_TASK_SOFT_TIME_LIMIT = 60
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
-# L
-
-
-# django-rest-framework
-
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.TokenAuthentication",
-    ),
-    "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticated",),
-}
-# django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
-CORS_URLS_REGEX = r"^/api/.*$"
-
-# Time limit to prefer plate from the menu
-
-MEALS_PREFERENCE_LIMIT = env('MEALS_PREFERENCE_LIMIT', default='11:00:00')
-
 # Slack's app token
 
 SLACK_BOT_TOKEN = env('SLACK_BOT_TOKEN')
+
+
+# Time limit to prefer plate from the menu
+
+MEALS_PREFERENCE_LIMIT = env('MEALS_PREFERENCE_LIMIT', default='11:00')
