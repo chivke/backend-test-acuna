@@ -4,6 +4,9 @@ from django.utils import timezone
 
 
 class MealsManager(models.Manager):
+    '''
+    Abstract manager to model of meals application.
+    '''
 
     def get_queryset(self, *args, **kwargs):
         return super().get_queryset(
@@ -12,7 +15,7 @@ class MealsManager(models.Manager):
 
 class AbstractMealsModel(models.Model):
     '''
-
+    Abstract manager to model of meals application.
     '''
     id = models.UUIDField(
         primary_key=True,
@@ -29,10 +32,16 @@ class AbstractMealsModel(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
+        '''
+        Registers latest edition.
+        '''
         self.modified_at = timezone.now()
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
+        '''
+        Don't delete, just mark as deleted.
+        '''
         self.deleted = True
         self.deleted_at = timezone.now()
         self.save()
