@@ -43,13 +43,6 @@ def test_menumanager_today():
     assert menu == MenuModel.objects.today().first()
 
 
-def test_menumanager_today_url():
-    menu = MenuModelFactory()
-    menu.date = dt.date.today()
-    menu.save()
-    assert MenuModel.objects.today_url() == f'/menu/{menu.pk}/'
-
-
 def test_menumodel_status_str():
     menu = MenuModelFactory()
     assert isinstance(menu.status, int)
@@ -63,22 +56,37 @@ def test_menumodel_current():
     assert menu.current
 
 
-def test_menumodel_announce():
+def test_menumodel_out_of_limit():
     menu = MenuModelFactory()
-    menu.date == dt.date.today() - dt.timedelta(1)
+    now = dt.datetime.now()
+    menu.date = dt.date.today()
+    menu.save()
+    fake_now = dt.datetime(
+        year=now.year, month=now.month, day=now.day, hour=10)
+    fake_now_out = dt.datetime(
+        year=now.year, month=now.month, day=now.day, hour=12)
+    assert menu.out_of_limit(fake_now_out)
+    assert not menu.out_of_limit(fake_now)
+
+
+def test_menumodel_close_preference():
+    menu = MenuModelFactory()
     try:
-        menu.announce()
-    except MenuModel.NotCurrently:
+        menu.close_preference()
+    except menu.NotAnnouncedYet:
         raised = True
     assert raised
-
-
-@pytest.fixture(autouse=True)
-def test_menumodel_out_of_limit(settings):
-    settings.MEALS_PREFERENCE_LIMIT = dt.datetime.strftime(
-        dt.datetime.now() - dt.timedelta(hours=1), '%H:%M:%S')
-    menu = MenuModelFactory()
-    assert menu.out_of_limit()
+    menu.announced = True
+    menu.save()
+    try:
+        menu.close_preference()
+    except menu.NotCurrently:
+        raised = True
+    assert raised
+    menu.date = dt.date.today()
+    menu.save()
+    menu.close_preference()
+    assert menu.status == menu.DISPATCHED
 
 
 def test_platemodel_str():

@@ -1,6 +1,10 @@
 from datetime import date
 from django.db import models
+from django.contrib.auth import get_user_model
 from .abstract import AbstractMealsModel, MealsManager
+
+
+User = get_user_model()
 
 
 class MealManager(MealsManager):
@@ -15,7 +19,8 @@ class MealManager(MealsManager):
 
 
 class MealModel(AbstractMealsModel):
-    ''''''
+    '''
+    '''
     employee = models.ForeignKey(
         'users.User',
         limit_choices_to={'role': 'E'},
@@ -28,7 +33,8 @@ class MealModel(AbstractMealsModel):
     plate = models.ForeignKey(
         'PlateModel',
         on_delete=models.PROTECT,
-        related_name='meals')
+        related_name='meals',
+        null=True)
     customization = models.TextField(
         blank=True, null=True)
     participated = models.BooleanField(default=False)

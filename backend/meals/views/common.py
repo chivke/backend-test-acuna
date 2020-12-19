@@ -14,7 +14,10 @@ class RootRouterView(LoginRequiredMixin, RedirectView):
         if self.request.user.profile.is_nora:
             return reverse('meals:nora-view')
         else:
-            return MenuModel.objects.today_url()
+            menu = MenuModel.objects.today().first()
+            if not menu:
+                return reverse('users:redirect')
+            return menu.get_absolute_url()
 
 
 root_view = RootRouterView.as_view()

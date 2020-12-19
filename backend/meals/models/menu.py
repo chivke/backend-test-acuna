@@ -1,12 +1,14 @@
 from datetime import datetime as dt
 from datetime import date
-from django.utils import timezone
 from django.db import models
 from django.urls import reverse
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
 from .abstract import AbstractMealsModel, MealsManager
-from backend.meals.tasks import announce_menu_in_slacks
+
+
+User = get_user_model()
 
 
 class MenuManager(MealsManager):
@@ -14,9 +16,6 @@ class MenuManager(MealsManager):
     def today(self):
         return self.filter(
             date=date.today())
-
-    def today_url(self):
-        return self.today().first().get_absolute_url()
 
 
 class MenuModel(AbstractMealsModel):
@@ -59,29 +58,25 @@ class MenuModel(AbstractMealsModel):
     def current(self):
         return self.date == date.today()
 
-    def announce(self):
+    def out_of_limit(self, datetime=None):
         '''
-        Change status to waiting (1) and announce it via slack.
-        '''
-        if self.current:
-            if self.status > self.WAITING:
-                raise self.NotCurrently
-            employees = User.objects.with_slack()
-            for employee in employees:
-                self.announce_menu_in_slack(
-                    self.pk, employee.pk)
-            return None
-        raise self.NotCurrently
+        Indicates if the menu is out of bounds for selecting lunch
+        preferences. If the menu does not correspond to the current
+        day, it will return false.
 
-    def out_of_limit(self):
+        : parse datetime: (default = None) allows comparing with a
+            datetime object other than the current time (for testing
+            purposes).
+        :return: boolean
         '''
-        '''
+        if not self.current:
+            return True
         limit = settings.MEALS_PREFERENCE_LIMIT
-        now = dt.now()
+        dtm = datetime if datetime else dt.now()
         limit = dt.strptime(
-            f'{dt.strftime(now, "%Y-%m-%d ")}' + limit,
-            '%Y-%m-%d %H:%M:%S')
-        return now > limit
+            f'{dt.strftime(dtm, "%Y-%m-%d ")}' + limit,
+            '%Y-%m-%d %H:%M')
+        return dtm > limit
 
     def close_preference(self):
         '''
@@ -90,5 +85,5 @@ class MenuModel(AbstractMealsModel):
             raise self.NotAnnouncedYet
         if not self.current:
             raise self.NotCurrently
-        self.status == self.DISPATCHED
+        self.status = self.DISPATCHED
         self.save()
