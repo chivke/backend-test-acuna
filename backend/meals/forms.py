@@ -1,8 +1,12 @@
 from django import forms
+
 from backend.meals.models import MenuModel, PlateModel, MealModel
 
 
 class MenuForm(forms.ModelForm):
+    '''
+    Form to edit menus
+    '''
     date = forms.DateField(
         label='Date of menu',
         widget=forms.SelectDateWidget)
@@ -13,6 +17,9 @@ class MenuForm(forms.ModelForm):
 
 
 class PlateForm(forms.ModelForm):
+    '''
+    Form to edit plate
+    '''
     short_desc = forms.CharField(
         label='Short description of plate',
         required=True)
@@ -27,6 +34,9 @@ class PlateForm(forms.ModelForm):
 
 
 class MenuPreferenceForm(forms.ModelForm):
+    '''
+    Form to serialize meals
+    '''
 
     class Meta:
         model = MealModel
