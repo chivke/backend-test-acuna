@@ -1,6 +1,5 @@
 
 import datetime
-from django.http import Http404
 from django.urls import reverse_lazy, reverse
 from django.views.generic import (
     TemplateView, CreateView, UpdateView, DeleteView, RedirectView)
@@ -18,6 +17,8 @@ from .mixins import NoraRequiredMixin
 
 class NoraView(NoraRequiredMixin, TemplateView):
     '''
+    Nora user's main private view, which allows him to control all menus,
+    dishes and the current status of the daily menu.
     '''
     template_name = 'meals/nora/main.html'
     extra_context = {'title': 'Nora\'s dashboard'}
@@ -46,6 +47,10 @@ nora_view = NoraView.as_view()
 
 
 class SendReminderView(NoraRequiredMixin, RedirectView):
+    '''
+    View that allows the user Nora to give the command to send
+    the reminder by slack.
+    '''
 
     def post(self, request, *args, **kwargs):
         today_menu = MenuModel.objects.today().first()
@@ -71,6 +76,7 @@ send_reminder_view = SendReminderView.as_view()
 
 class CreateMenuView(NoraRequiredMixin, CreateView):
     '''
+    View for creating a menu.
     '''
     model = MenuModel
     template_name = 'meals/nora/menu-create.html'
@@ -83,6 +89,7 @@ menu_create_view = CreateMenuView.as_view()
 
 class UpdateMenuView(NoraRequiredMixin, UpdateView):
     '''
+    View for editing a menu.
     '''
     model = MenuModel
     template_name = 'meals/nora/menu-update.html'
@@ -95,6 +102,7 @@ menu_update_view = UpdateMenuView.as_view()
 
 class DeleteMenuView(NoraRequiredMixin, DeleteView):
     '''
+    View for delete a menu.
     '''
     model = MenuModel
     template_name = 'meals/nora/delete.html'
@@ -106,6 +114,9 @@ menu_delete_view = DeleteMenuView.as_view()
 
 
 class CreatePlateView(NoraRequiredMixin, CreateView):
+    '''
+    View for creating a plate.
+    '''
     model = PlateModel
     template_name = 'meals/nora/plate-create.html'
     extra_context = {'title': 'Create plate'}
@@ -116,6 +127,9 @@ plate_create_view = CreatePlateView.as_view()
 
 
 class UpdatePlateView(NoraRequiredMixin, UpdateView):
+    '''
+    View for editing a plate.
+    '''
     model = PlateModel
     template_name = 'meals/nora/plate-update.html'
     extra_context = {'title': 'Update plate'}
@@ -127,6 +141,7 @@ plate_update_view = UpdatePlateView.as_view()
 
 class DeletePlateView(NoraRequiredMixin, DeleteView):
     '''
+    View for delete a plate.
     '''
     model = PlateModel
     template_name = 'meals/nora/delete.html'
