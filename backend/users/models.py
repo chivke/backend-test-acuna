@@ -37,24 +37,39 @@ class Profile(models.Model):
 
 
 class UserManager(UserManager):
-    '''Model manager who creates profile when creating users.'''
+    '''
+    User model manager.
+
+    Assign a profile to each user that is created.
+    '''
 
     def create(self, role='E', *args, **kwargs):
+        '''
+        Assign a profile to the user you create if it doesn't exist.
+        '''
         user = super().create(*args, **kwargs)
         user.create_profile(role=role)
         return user
 
     def get_or_create(self, role='E', *args, **kwargs):
+        '''
+        Assign a profile to the user if it is created.
+        '''
         user, created = super().get_or_create(*args, **kwargs)
         user.create_profile(role=role)
         return user, created
 
     def with_slack(self):
+        '''
+        Returns only users with slack id.
+        '''
         return self.exclude(profile__slack_id=None)
 
 
 class User(AbstractUser):
-    '''Default user for nora's backend.'''
+    '''
+    Default user for nora's backend.
+    '''
 
     class Meta:
         verbose_name = 'user'
@@ -71,6 +86,9 @@ class User(AbstractUser):
         return f'{string}'
 
     def save(self, *args, **kwargs):
+        '''
+        Assign a profile to each user that is saved.
+        '''
         super().save(*args, **kwargs)
         role = 'N' if self.is_superuser else 'E'
         self.create_profile(role=role)
