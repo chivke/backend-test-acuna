@@ -11,15 +11,15 @@
   <h3>Hello! I share with you today's menu :)</h3>
 
   <ul class="list-group">
-    {% for plate in menu.plates %}
+    {% for plate in plates %}
       <li class="list-group-item 
        {% if meal.plate == plate %}active{% endif %}"
-      >plate.short_desc</li>
+      >{{ plate.short_desc }}</li>
     {% endfor %}
   </ul>
-  {% if not meal %}
+  {% if not meal and not out_of_limit %}
     <p>Select the food you prefer!</p>
-    <a href="{% url 'meals:menu-preference' %}"
+    <a href="{% url 'meals:menu-preference' object.pk %}"
        role="button" class="btn btn-primary">Go</a>
   {% elif meal.participated %}
     <p>You have already selected your food!</p>

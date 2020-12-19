@@ -1,54 +1,75 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Nora's dashboard{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block content %}
  
-<h1>Nora's dashboard</h1>
+<h1>{{ title }}</h1>
  
-<div>
-  <h2>Today's menu ({{ today }})</h2>
-    {% if today_menu %}
+  <p>Limit to preferer: {{ prefer_limit }} hrs.</p>
+    {% if today.out_of_limit %}
+      <p>Out of time limit for employees to choose their preferences</p>
+    {% else %}
+      <p>Employees can still choose their preference</p>
+    {% endif %}
 
-      <h4>Status: {{ today_menu.status_str }}</h4>
-        {% if today_menu.out_of_limit %}
-          <p>Out of limit to choose menu preferences</p>
-        {% else %}
-          <p>Limit to preferer: {{ prefer_limit }} hrs.</p>
-          <a href="{% url 'meals:' %}"
-            role="button" class="btn btn-primary">Enviar recordatorio</a>
-          {% if today_menu.announced %}
-          <p>It has already been sent before</p>
-          {% endif %}
-        {% endif %}
-      <h4>Lunches chosen by employees</h4>
-      <ul class="list-group">
-      {% for meal in meals %}
-        <li class="list-group-item">
-          {{ meal.employee.username }}: {{ meal.plate.short_desc }}
-        </li>
+<h2>Today's menu ({{ today.date }})</h2>
+
+<div class="card">
+  {% if today.menu %}
+    <div class="card-body">
+      <h5 class="card-title">{{ today.menu.status_str }}</h5>
+      <h6 class="card-subtitle text-muted">{{ today.date }}</h6>
+    </div>
+    <ul class="list-group list-group-flush">
+      {% for plate in today.plates %}
+        <li class="list-group-item">{{ plate.short_desc }}</li>
       {% endfor %}
-      </ul>
-      {% if without_prefer %}
-        <h4>Waiting for the following employees:</h4>
-          <ul class="list-group">
-          {% for employee in without_prefer %}
-            <li class="list-group-item">{{ employee.username }}</li>
-          {% endfor %}
-          </ul>
-      {% endif %}
+    </ul>
 
-   {% else %}
-      <p>There is no menu for today, please create one.</p>
-   {% endif %}
+    <form method="post" action="{% url 'meals:send-reminder' %}">
+      {% csrf_token %}
+      <button type="submit"class="btn btn-primary">Send reminder</button>
+    </form>
+
+  {% else %}
+      <h5 class="card-title">No menu yet</h5>
+      <h6 class="card-subtitle text-muted">
+        There is no menu for today, please create one.
+      </h6>
+  {% endif %}
 </div>
+{% if today.menu %}
+  <h4>Lunches chosen by employees</h4>
+  {% if today.meals %}
+  <ul class="list-group">
+    {% for meal in today.meals %}
+      <li class="list-group-item">
+        {{ meal.employee.username }}: {{ meal.plate.short_desc }}
+      </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p>No one has selected yet</p>
+  {% endif %}
+{% endif %}
+
+{% if today.users_without_prefer %}
+  <h4>Waiting for the following employees:</h4>
+    <ul class="list-group">
+    {% for employee in today.users_without_prefer %}
+      <li class="list-group-item">{{ employee.username }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
 <div>
   <h2>All menus</h2>
     <a href="{% url 'meals:menu-create' %}"
        role="button" class="btn btn-primary">Create menu</a>
-    {% if menus %}
-      {% for menu in menus %}
+    {% if all_menus %}
+      {% for menu in all_menus %}
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">{{menu.date}}</h5>
@@ -67,9 +88,9 @@
    <h2>All plates</h2>
    <a href="{% url 'meals:plate-create' %}"
    role="button" class="btn btn-primary">Create plate</a>
-   {% if plates %}
+   {% if all_plates %}
     <ul class="list-group">
-      {% for plate in plates %}
+      {% for plate in all_plates %}
       <a class="list-group-item list-group-item-action"
         href="{% url 'meals:plate-update' plate.pk%}"
       >{{ plate.short_desc }}</a>
