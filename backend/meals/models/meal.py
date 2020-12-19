@@ -8,18 +8,29 @@ User = get_user_model()
 
 
 class MealManager(MealsManager):
+    '''
+    Manager to meal model.
+    '''
 
     def today(self):
+        '''
+        Returns only the meals of today
+        '''
         return self.filter(menu__date=date.today())
 
     def today_from_user(self, user):
         '''
+        Return onlu the meals of today from user.
         '''
         return self.today().filter(employee=user)
 
 
 class MealModel(AbstractMealsModel):
     '''
+    Model of an employee meal.
+
+    It links the employee, the menu, the dish ordered or
+    assigned to him and the customization if required.
     '''
     employee = models.ForeignKey(
         'users.User',
