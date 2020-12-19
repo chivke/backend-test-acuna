@@ -6,7 +6,11 @@ from django.urls import reverse
 
 class PlateModel(AbstractMealsModel):
     '''
+    Model of a meal plate.
 
+    A plate is cooked and enjoyed more than once. A dish is cooked and
+    enjoyed more than once. This model links the plate with the meals
+    and the employees
     '''
     description = models.CharField(
         max_length=500, blank=True)
@@ -24,15 +28,23 @@ class PlateModel(AbstractMealsModel):
         return reverse('meals:plate-update', args=[self.pk])
 
     def record_usage(self):
-        ''''''
+        '''
+        Method to mark a use.
+        '''
         self.last_use = timezone.now()
         self.save()
 
     @property
     def times_eaten(self):
+        '''
+        How many times the plate has been eaten.
+        '''
         return self.meals.all().count()
 
     @property
     def times_custom(self):
+        '''
+        How many times the plate has been personalized.
+        '''
         return self.meals.exclude(
             customization=None).count()
