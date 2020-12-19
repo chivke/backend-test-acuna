@@ -23,6 +23,7 @@ logger = get_task_logger(__name__)
 @celery_app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     '''
+    Function that configures the periodic tasks
     '''
     sender.add_periodic_task(
         cron_meals_preference_limit(),
@@ -32,6 +33,9 @@ def setup_periodic_tasks(sender, **kwargs):
 @celery_app.task()
 def menu_limit_and_dispatch():
     '''
+    Task that closes the possibility that employees can select
+    their food. Select a plate in a pseudo-random way for
+    those who have not reached.
     '''
     today_menu = MenuModel.objects.today().first()
     if not today_menu:
@@ -52,7 +56,8 @@ def menu_limit_and_dispatch():
 
 def menu_announce_trigger(menu):
     '''
-    Change status to waiting (1) and announce it via slack.
+    Function that triggers the sending of reminders through
+    slacks to all employees. Change menu status to waiting (1).
     '''
     if menu.current:
         if menu.status > menu.WAITING:
@@ -71,6 +76,11 @@ def menu_announce_trigger(menu):
 @celery_app.task()
 def menu_announce_in_slack(menu_pk, employee_pk):
     '''
+    Task that sends a message with today's menu options along with the link
+    to access to select your preference. Use the slack sdk.
+
+    Only send the message to employees who have a slack ID set in the
+    slack_id attribute.
     '''
     menu = MenuModel.objects.filter(pk=menu_pk).first()
     employee = User.objects.filter(pk=employee_pk).first()
