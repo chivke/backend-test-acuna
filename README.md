@@ -1,5 +1,9 @@
 # Cornershop's Backend Test 
 
+> Developed with docker. Documentation on port 7000.
+>  docker-compose -f local.yml build
+>  docker-compose up
+
 This technical test requires the design and implementation (using Django) of a management system to coordinate the meal delivery for Cornershop employees.
 
 ## Before you begin
