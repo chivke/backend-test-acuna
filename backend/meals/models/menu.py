@@ -12,14 +12,26 @@ User = get_user_model()
 
 
 class MenuManager(MealsManager):
+    '''
+    Manager to menu model.
+    '''
 
     def today(self):
+        '''
+        Returns only the menu of today.
+        '''
         return self.filter(
             date=date.today())
 
 
 class MenuModel(AbstractMealsModel):
-    ''''''
+    '''
+    Model of a daily menu.
+
+    The menu centralizes the states of the process, indicating
+    if the menu is being planned, the possible preference of
+    the employees is being awaited and finally the dispatch.
+    '''
     PLANNING = 0
     WAITING = 1
     DISPATCHED = 2
@@ -30,9 +42,15 @@ class MenuModel(AbstractMealsModel):
     )
 
     class NotCurrently(Exception):
+        '''
+        Exception indicating that the menu is not current.
+        '''
         pass
 
     class NotAnnouncedYet(Exception):
+        '''
+        Exception indicating that the menu is not announced yet.
+        '''
         pass
 
     date = models.DateField(unique=True)
@@ -52,10 +70,16 @@ class MenuModel(AbstractMealsModel):
 
     @property
     def status_str(self):
+        '''
+        Returns the current status description.
+        '''
         return self.STATUS_CHOICES[self.status][1]
 
     @property
     def current(self):
+        '''
+        Returns a boolean if current or not.
+        '''
         return self.date == date.today()
 
     def out_of_limit(self, datetime=None):
@@ -80,6 +104,7 @@ class MenuModel(AbstractMealsModel):
 
     def close_preference(self):
         '''
+        Method to dispatch the menu and close de preferences.
         '''
         if not self.announced:
             raise self.NotAnnouncedYet
