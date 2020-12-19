@@ -10,9 +10,6 @@ os.environ.setdefault('DATABASE_URL', '')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')
 django.setup()
 
-# project = 'BEEBot'
-# copyright = '''2020, FYX'''
-# author = 'FYX'
 
 extensions = [
     'sphinx.ext.autodoc',
